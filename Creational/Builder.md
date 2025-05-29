@@ -158,3 +158,93 @@ WoodenBuilder       StoneBuilder
 4. Почему Builder хорошо сочетается с паттерном Composite или Decorator?
 5. Какие проблемы могут возникнуть при попытке повторного использования `builder->getHouse()`?
 6. Как бы вы реализовали Builder для сложной структуры данных, например, `JSON` или `SQL-запрос`?
+
+## 🧱 Паттерн 4: **Builder (Строитель)**
+
+### 🔍 Углубляющие вопросы и ответы (расширенные)
+
+1. **Зачем нужен `Director`, если можно напрямую управлять `Builder`?**
+
+   * `Director` инкапсулирует алгоритм построения. Это важно, если один и тот же процесс может применяться к разным билдерам. Но его можно опустить при использовании fluent-стиля.
+
+2. **Fluent Builder: как реализовать?**
+
+   * Fluent-интерфейс возвращает ссылку на самого себя после каждого вызова, позволяя вызывать методы цепочкой.
+
+3. **Builder vs Abstract Factory?**
+
+   * **Builder** строит **один сложный объект пошагово**, а **Abstract Factory** создает **разные, но совместимые объекты** сразу.
+
+---
+
+### 💻 Расширенный Fluent Builder на C++
+
+```cpp
+#include <iostream>
+#include <string>
+#include <memory>
+
+class Car {
+public:
+    std::string engine;
+    std::string transmission;
+    std::string color;
+
+    void print() const {
+        std::cout << "Car with engine: " << engine
+                  << ", transmission: " << transmission
+                  << ", color: " << color << "\n";
+    }
+};
+
+class CarBuilder {
+private:
+    std::unique_ptr<Car> car = std::make_unique<Car>();
+
+public:
+    CarBuilder& setEngine(const std::string& engineType) {
+        car->engine = engineType;
+        return *this;
+    }
+
+    CarBuilder& setTransmission(const std::string& transmissionType) {
+        car->transmission = transmissionType;
+        return *this;
+    }
+
+    CarBuilder& setColor(const std::string& color) {
+        car->color = color;
+        return *this;
+    }
+
+    std::unique_ptr<Car> build() {
+        return std::move(car);
+    }
+};
+
+int main() {
+    CarBuilder builder;
+    auto sportsCar = builder.setEngine("V8")
+                            .setTransmission("Automatic")
+                            .setColor("Red")
+                            .build();
+    sportsCar->print();
+}
+```
+
+---
+
+### 🖼️ Схема Builder с fluent-интерфейсом
+
+```
+    [CarBuilder]
+        |
+    +--------------------+
+    | setEngine()        |
+    | setTransmission()  |
+    | setColor()         |
+    | build()            |
+    +--------------------+
+        |
+      Car (V8, Automatic, Red)
+```
