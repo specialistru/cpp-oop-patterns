@@ -233,4 +233,101 @@ public:
     void interact(AbstractProductA* a)
 ::contentReference[oaicite:0]{index=0}
  
+```cpp
+class ConcreteProductB1 : public AbstractProductB {
+public:
+    void interact(AbstractProductA* a) override {
+        std::cout << "ConcreteProductB1 взаимодействует с ";
+        a->use();
+    }
+};
+
+class ConcreteProductB2 : public AbstractProductB {
+public:
+    void interact(AbstractProductA* a) override {
+        std::cout << "ConcreteProductB2 взаимодействует с ";
+        a->use();
+    }
+};
+
+// Абстрактная фабрика
+class AbstractFactory {
+public:
+    virtual AbstractProductA* createProductA() const = 0;
+    virtual AbstractProductB* createProductB() const = 0;
+    virtual ~AbstractFactory() = default;
+};
+
+// Конкретная фабрика 1
+class ConcreteFactory1 : public AbstractFactory {
+public:
+    AbstractProductA* createProductA() const override {
+        return new ConcreteProductA1();
+    }
+
+    AbstractProductB* createProductB() const override {
+        return new ConcreteProductB1();
+    }
+};
+
+// Конкретная фабрика 2
+class ConcreteFactory2 : public AbstractFactory {
+public:
+    AbstractProductA* createProductA() const override {
+        return new ConcreteProductA2();
+    }
+
+    AbstractProductB* createProductB() const override {
+        return new ConcreteProductB2();
+    }
+};
+
+// Клиент
+void clientCode(const AbstractFactory& factory) {
+    AbstractProductA* productA = factory.createProductA();
+    AbstractProductB* productB = factory.createProductB();
+
+    productB->interact(productA);
+
+    delete productA;
+    delete productB;
+}
+
+int main() {
+    ConcreteFactory1 factory1;
+    ConcreteFactory2 factory2;
+
+    std::cout << "Клиент с ConcreteFactory1:\n";
+    clientCode(factory1);
+
+    std::cout << "\nКлиент с ConcreteFactory2:\n";
+    clientCode(factory2);
+
+    return 0;
+}
+```
+
+---
+
+### 🖼️ Более сложная схема Abstract Factory
+
+```
+              +-------------------------+
+              |     AbstractFactory     |
+              |-------------------------|
+              | +createProductA()       |
+              | +createProductB()       |
+              +-------------------------+
+                 ▲                 ▲
+      +------------------+   +------------------+
+      | ConcreteFactory1 |   | ConcreteFactory2 |
+      +------------------+   +------------------+
+      | A1, B1           |   | A2, B2           |
+      +------------------+   +------------------+
+        ▲         ▲               ▲         ▲
++-------------+ +-------------+ +-------------+ +-------------+
+| ProductA1   | | ProductB1   | | ProductA2   | | ProductB2   |
++-------------+ +-------------+ +-------------+ +-------------+
+                         ▲             ▲
+                    [Interaction via AbstractProductB]
 ```
